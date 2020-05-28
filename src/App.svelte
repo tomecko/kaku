@@ -97,9 +97,13 @@
 </script>
 
 <style>
+  section {
+    text-align: center;
+  }
+
   .reading,
   .meaning {
-    border: 1px solid #ccc;
+    border: 1px solid #333;
     display: inline-block;
     margin-bottom: 0.5rem;
     margin-right: 0.5rem;
@@ -107,7 +111,7 @@
   }
 
   .reading {
-    background: #ddd;
+    background: #222;
   }
 
   .meaning-primary,
@@ -119,6 +123,7 @@
   #kanji-animated {
     height: 300px;
     width: 300px;
+    margin: 0 auto;
   }
 </style>
 
@@ -140,8 +145,8 @@
       <p>Loading…</p>
     {:then}
       {#if currentItem}
+        <p>{currentItemIndexInc})</p>
         <p>
-          {currentItemIndexInc})
           {#each currentItem.readings as { primary, reading }}
             <span class={cx('reading', { 'reading-primary': primary })}>
               {reading}
