@@ -77,18 +77,20 @@
     });
   }
   function handleKeydown(event) {
+    console.log(event.code);
     switch (event.code) {
+      case "KeyD":
       case "Space":
+      case "ArrowRight":
         event.preventDefault();
         goToNext();
         break;
-      case "ArrowRight":
-        goToNext();
-        break;
+      case "KeyS":
       case "ArrowDown":
         event.preventDefault();
         revealOrRedraw();
         break;
+      case "KeyA":
       case "ArrowLeft":
         goToPrevious();
         break;
