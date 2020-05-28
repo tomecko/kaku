@@ -6,11 +6,15 @@
   import WaniKani from "./services/wanikani";
   import { shuffleArray } from "./helpers/shuffleArray";
 
+  const WANIKANI_API_KEY = "waniKaniAPIKey";
+
   let items = {};
   let itemsPromise = null;
   let currentItemIndex = 0;
   let revealed = false;
-  let waniKaniAPIKey = "0d725fab-3a4b-4c66-b784-f706aeadc74e";
+  let waniKaniAPIKey = localStorage.getItem(WANIKANI_API_KEY) || "";
+  let startTime = null;
+  let timeElapsed = 0;
 
   $: itemKeys = shuffleArray(Object.keys(items));
   $: currentItem = items[itemKeys[currentItemIndex]];
@@ -43,11 +47,16 @@
     if (!waniKaniAPIKey) {
       return;
     }
+    localStorage.setItem(WANIKANI_API_KEY, waniKaniAPIKey);
     const waniKani = new WaniKani(waniKaniAPIKey);
     itemsPromise = waniKani.getKanjiInfos().then(data => {
       items = pickBy(data, val => val.stage === "Burned");
       currentItemIndex = 0;
       revealed = false;
+      startTime = Date.now();
+      setInterval(() => {
+        timeElapsed = Math.floor((Date.now() - startTime) / (1000 * 60));
+      }, 1000);
     });
   }
   function drawKanji() {
@@ -139,14 +148,15 @@
   {#if !currentItem}
     <section>
       <input bind:value={waniKaniAPIKey} type="text" placeholder="APIv2 Key" />
-      <button on:click={getWaniKaniData}>get data</button>
+      <button on:click={getWaniKaniData}>ダウンロードする</button>
     </section>
   {/if}
   <section>
     {#await itemsPromise}
-      <p>Loading…</p>
+      <p>ローディング。。。</p>
     {:then}
       {#if currentItem}
+        <p>{timeElapsed}分</p>
         <p>{currentItemIndexInc})</p>
         <p>
           {#each currentItem.readings as { primary, reading }}
