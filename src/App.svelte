@@ -86,7 +86,6 @@
     });
   }
   function handleKeydown(event) {
-    console.log(event.code);
     switch (event.code) {
       case "KeyD":
       case "Space":
@@ -108,8 +107,14 @@
 </script>
 
 <style>
-  section {
-    text-align: center;
+  :global(html, body) {
+    margin: 0;
+  }
+
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
   }
 
   .reading,
@@ -134,7 +139,23 @@
   #kanji-animated {
     height: 300px;
     width: 300px;
-    margin: 0 auto;
+    margin: 20px;
+  }
+
+  .iframe-wrapper {
+    position: absolute;
+    top: -120px;
+    right: 0;
+    bottom: 0;
+    width: 750px;
+    overflow: hidden;
+  }
+
+  iframe {
+    transform: scale(0.9);
+    transform-origin: top right;
+    width: 100%;
+    height: calc(111vh + 125px);
   }
 </style>
 
@@ -144,36 +165,39 @@
 
   </script>
 </svelte:head>
-<main>
+<main class="main-container">
   {#if !currentItem}
     <section>
       <input bind:value={waniKaniAPIKey} type="text" placeholder="APIv2 Key" />
       <button on:click={getWaniKaniData}>ダウンロードする</button>
     </section>
   {/if}
-  <section>
-    {#await itemsPromise}
-      <p>ローディング。。。</p>
-    {:then}
-      {#if currentItem}
-        <p>{timeElapsed}分</p>
-        <p>{currentItemIndexInc})</p>
-        <p>
-          {#each currentItem.readings as { primary, reading }}
-            <span class={cx('reading', { 'reading-primary': primary })}>
-              {reading}
-            </span>
-          {/each}
-          {#each currentItem.meanings as { meaning, primary }}
-            <span class={cx('meaning', { 'meaning-primary': primary })}>
-              {meaning}
-            </span>
-          {/each}
-        </p>
-        {#if revealed}
-          <div id="kanji-animated" on:click={drawKanji} />
-        {/if}
+  {#await itemsPromise}
+    <p>ローディング。。。</p>
+  {:then}
+    {#if currentItem}
+      <p>{timeElapsed}分</p>
+      <p>{currentItemIndexInc})</p>
+      <p>
+        {#each currentItem.readings as { primary, reading }}
+          <span class={cx('reading', { 'reading-primary': primary })}>
+            {reading}
+          </span>
+        {/each}
+        {#each currentItem.meanings as { meaning, primary }}
+          <span class={cx('meaning', { 'meaning-primary': primary })}>
+            {meaning}
+          </span>
+        {/each}
+      </p>
+      {#if revealed}
+        <div id="kanji-animated" on:click={drawKanji} />
+        <div class="iframe-wrapper">
+          <iframe
+            src={`https://jisho.org/search/*${currentItem.kanji}*`}
+            title="" />
+        </div>
       {/if}
-    {/await}
-  </section>
+    {/if}
+  {/await}
 </main>
