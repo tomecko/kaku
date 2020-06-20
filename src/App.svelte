@@ -149,6 +149,7 @@
     bottom: 0;
     width: 750px;
     overflow: hidden;
+    filter: invert(100%);
   }
 
   iframe {
