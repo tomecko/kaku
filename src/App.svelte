@@ -104,6 +104,9 @@
         break;
     }
   }
+  function focusAway() {
+    document.getElementById("kanji-animated").focus();
+  }
 </script>
 
 <style>
@@ -192,11 +195,12 @@
         {/each}
       </p>
       {#if revealed}
-        <div id="kanji-animated" on:click={drawKanji} />
+        <div id="kanji-animated" on:click={drawKanji} tabindex="0" />
         <div class="iframe-wrapper">
           <iframe
             src={`https://jisho.org/search/*${currentItem.kanji}*`}
-            title="" />
+            title=""
+            on:load={focusAway} />
         </div>
       {/if}
     {/if}
