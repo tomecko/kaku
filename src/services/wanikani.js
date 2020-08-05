@@ -1,9 +1,9 @@
 import { mapValues } from "lodash-es";
 
 const LOCKED = "Locked";
+const LEVELS_COUNT = 60;
 
 export default class Wanikani {
-
   constructor(APIKey) {
     this.APIKey = APIKey;
     this.url = "https://api.wanikani.com/v2/";
@@ -17,9 +17,13 @@ export default class Wanikani {
     return this.get("srs_stages").then(({ data }) => data);
   }
 
-  getKanjiInfos() {
+  getKanjiInfos(minLevel, maxLevel) {
+    const levels = Array(LEVELS_COUNT)
+      .fill()
+      .map((_, i) => i + 1)
+      .filter(i => i >= minLevel && i <= maxLevel);
     return Promise.all([
-      this.getKanjiStudyInfos(),
+      this.getKanjiStudyInfos(levels),
       this.getAllKanjiStaticInfos(),
     ]).then(([studyInfos, staticInfos]) => {
       const studyInfosMap = studyInfos.reduce(
@@ -36,9 +40,9 @@ export default class Wanikani {
     });
   }
 
-  getKanjiStudyInfos() {
+  getKanjiStudyInfos(levels) {
     return this.getPagedData(
-      "assignments?subject_types=kanji&unlocked=true"
+      `assignments?subject_types=kanji&unlocked=true&levels=${levels.join(',')}`
     ).then((all) =>
       all.map(({ data }) => ({
         srsStage: data.srs_stage,

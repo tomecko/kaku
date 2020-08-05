@@ -12,6 +12,8 @@
   let itemsPromise = null;
   let currentItemIndex = 0;
   let revealed = false;
+  let waniKaniLevelMin = 0;
+  let waniKaniLevelMax = 60;
   let waniKaniAPIKey = localStorage.getItem(WANIKANI_API_KEY) || "";
   let startTime = null;
   let timeElapsed = 0;
@@ -49,15 +51,17 @@
     }
     localStorage.setItem(WANIKANI_API_KEY, waniKaniAPIKey);
     const waniKani = new WaniKani(waniKaniAPIKey);
-    itemsPromise = waniKani.getKanjiInfos().then(data => {
-      items = pickBy(data, val => val.stage === "Burned");
-      currentItemIndex = 0;
-      revealed = false;
-      startTime = Date.now();
-      setInterval(() => {
-        timeElapsed = Math.floor((Date.now() - startTime) / (1000 * 60));
-      }, 1000);
-    });
+    itemsPromise = waniKani
+      .getKanjiInfos(waniKaniLevelMin, waniKaniLevelMax)
+      .then(data => {
+        items = pickBy(data, val => val.stage === "Burned");
+        currentItemIndex = 0;
+        revealed = false;
+        startTime = Date.now();
+        setInterval(() => {
+          timeElapsed = Math.floor((Date.now() - startTime) / (1000 * 60));
+        }, 1000);
+      });
   }
   function drawKanji() {
     const el = "kanji-animated";
@@ -172,6 +176,14 @@
 <main class="main-container">
   {#if !currentItem}
     <section>
+      <div>
+        <input bind:value={waniKaniLevelMin} type="range" min="1" max="60" />
+        {waniKaniLevelMin}
+      </div>
+      <div>
+        <input bind:value={waniKaniLevelMax} type="range" min="1" max="60" />
+        {waniKaniLevelMax}
+      </div>
       <input bind:value={waniKaniAPIKey} type="text" placeholder="APIv2 Key" />
       <button on:click={getWaniKaniData}>ダウンロードする</button>
     </section>
